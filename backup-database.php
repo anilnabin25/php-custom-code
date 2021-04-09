@@ -5,7 +5,7 @@ ini_set('memory_limit', '-1');
 $host = "172.16.238.10";
 $user = "wwwaap";
 $pw = 'Wwwaap@123';
-$db_name = "wwwaap";
+$db_name = "test";
 $dsn = "mysql:host=$host;dbname=$db_name";
 
 $connect = new PDO($dsn, $user, $pw);
@@ -17,9 +17,7 @@ $statement->execute();
 $result = $statement->fetchAll();
 
 $output = '';
-//$data = false;
 $data = $_GET['data'];
-//print_b($data);
 foreach ($result as $table) {
 
   $output .= "\n\n--  ==== started " . $table[0] . " ====";
@@ -34,20 +32,24 @@ foreach ($result as $table) {
       $output .= "\n\n" . $show_table_row["Create Table"] . ";\n\n";
     }
     if ($data == 1) {
-      $select_query = "SELECT * FROM " . $table[0] . "";
+      $column_names = column_names($connect, $table[0]);
+      $select_query = "SELECT " . implode(",", $column_names["column_names_with_quote"]) . " FROM " . $table[0] . "";
       $statement = $connect->prepare($select_query);
       $statement->execute();
       $table_row = $statement->rowCount();
 
       for ($i = 0; $i < $table_row; $i++) {
         $single_result = $statement->fetch(PDO::FETCH_ASSOC);
-        $table_column_array = array_keys($single_result);
-        $table_value_array = array_values($single_result);
-
+        $table_column_array = [];
+        $table_value_array = [];
+        foreach ($single_result as $key => $value) {
+          array_push($table_column_array, $key);
+          array_push($table_value_array, json_encode($value));
+        }
 
         $output .= "\nINSERT INTO $table[0](";
-        $output .= "" . implode(", ", $table_column_array) . ") VALUES (";
-        $output .= "\"" . implode("\",\"", $table_value_array) . "\");\n";
+        $output .= "" . implode(", ", $column_names["column_names"]) . ") VALUES (";
+        $output .= "" . implode(",", $table_value_array) . ");\n";
       }
     }
   } else {
@@ -77,7 +79,25 @@ foreach ($result as $table) {
 //$mysqlExportPath = $table[0] . date("y-m-d h:i:sa") . '.sql';
 $mysqlExportPath = "backup-file" . date("y-m-d h:i:sa") . '.sql';
 print_to_file($mysqlExportPath, $output);
-print_r("$mysqlExportPath     , <br>");
+//print_r("$mysqlExportPath     , <br>");
+
+
+function column_names($connect, $table_name)
+{
+  $fetch_column_name = "DESCRIBE " . $table_name . "";
+  $statement = $connect->prepare($fetch_column_name);
+  $statement->execute();
+  $table_row = $statement->rowCount();
+  $column_names = [];
+  $column_names_with_quote = [];
+  for ($i = 0; $i < $table_row; $i++) {
+    $single_result = $statement->fetch(PDO::FETCH_ASSOC);
+    array_push($column_names_with_quote, "QUOTE(" . $single_result["Field"] . ")");
+    array_push($column_names, $single_result["Field"]);
+
+  }
+  return ["column_names_with_quote" => $column_names_with_quote, "column_names" => $column_names];
+}
 
 function print_to_file($filename, $data)
 {
@@ -98,6 +118,11 @@ function print_to_file($filename, $data)
   unlink($filename);
 }
 
+function print_a($data)
+{
+  echo "<pre>";
+  print_r($data);
+}
 
 function print_b($data)
 {

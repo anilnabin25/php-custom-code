@@ -3,3 +3,5 @@
 <a href="backup-database.php?data=0">Backup database only</a>
 <br/>
 <a href="dump-command.php">Dump command</a>
+<br/>
+<a href="dump2.php">Dump command 2</a>
