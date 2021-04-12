@@ -6,13 +6,14 @@ $host = "172.16.238.10";
 $user = "wwwaap";
 $pw = 'Wwwaap@123';
 $db_name = "wwwaap";
+$charset = "utf8"; // if you know change to the required otherwise set it to the "utf8"
 
 //$host = "sddb0040315208.cgidb";
 //$user = "sddbMTcyMDgz";
 //$pw = 'NOyt$X9s';
 //$db_name = "sddb0040315208";
 
-$dsn = "mysql:host=$host;dbname=$db_name;charset=utf8";
+$dsn = "mysql:host=$host;dbname=$db_name;charset=$charset";
 
 $connect = new PDO($dsn, $user, $pw);
 $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
