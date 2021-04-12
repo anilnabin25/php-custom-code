@@ -12,7 +12,7 @@ $db_name = "wwwaap";
 //$pw = 'NOyt$X9s';
 //$db_name = "sddb0040315208";
 
-$dsn = "mysql:host=$host;dbname=$db_name";
+$dsn = "mysql:host=$host;dbname=$db_name;charset=utf8";
 
 $connect = new PDO($dsn, $user, $pw);
 $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
